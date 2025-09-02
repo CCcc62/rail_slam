@@ -278,40 +278,40 @@ def projection(pole_points,pose_data,pole_data): #计算点云的面投影
     
 if __name__ == "__main__":
     # camera intrinsics
-    W, H = 635, 360 #854,480
-    F = 656 #739 #658
-    K = np.array([[F,0,W//2],[0,F,H//2],[0,0,1]])
-    mapp = Map(1024, 768)    # 构建地图
-    cap = cv2.VideoCapture("/home/syl/movie_003.mp4")
-    pcd_data = np.loadtxt('/home/syl/pcd.txt')#全部三维地图点云信息
-    pole_data = np.loadtxt('/home/syl/pcd_bbox.txt')#所有电线杆的三维点云信息
-    pose_data =np.loadtxt('/home/syl/pose.txt')#相机位姿
-    
-    process_txt=open("/home/syl/processed.txt",'a')
+    W, H = 635, 360  # 854,480
+    F = 656  # 739 #658
+    K = np.array([[F, 0, W // 2], [0, F, H // 2], [0, 0, 1]])
+    mapp = Map(1024, 768)  # 构建地图
+    cap = cv2.VideoCapture("/home/lcy/movie_003.mp4")
+    pcd_data = np.loadtxt('/home/lcy/pcd.txt')  # 全部三维地图点云信息
+    pole_data = np.loadtxt('/home/lcy/pcd_bbox.txt')  # 所有电线杆的三维点云信息
+    pose_data = np.loadtxt('/home/lcy/pose.txt')  # 相机位姿
+
+    process_txt = open("/home/lcy/processed.txt", 'a')
     process_txt.truncate(0)
-    
-    for i in range(0,len(pose_data[:,0])//4):
-    	ret,image=cap.read()
-    	image=cv2.resize(image,(W,H))
-    	cv2.imshow('video',image)
-    	if i==0: #相机位姿一帧一帧画，点云一次性画
-    	    pole_points,pole_line=get_pole_info(pole_data) #获取所有电线杆点云 、线投影
-    	    '''#修正电线杆之间的间隔
-    	    pole_points=correct_interval(pole_points)
-    	    #修正pole_point 与相机位姿曲线的距离
-    	    pole_points=correct_distance(pole_points,pose_data)'''
-    	    
-    	    pole_plane_points= projection(pole_points,pose_data,pole_data)# 相机曲线过每个电线杆中心点的法平面，获取点云的面投影
-            
-    	    mapp.add_observation(pose_data[4*i:4*(i+1),:],[[0,0,0,1]],[[0,0,0,1]],pole_line) 
-    	    #mapp.add_observation(pose_data[4*i:4*(i+1),:],pcd_data,pole_data[:,1:],pole_points) 
-    	    np.savetxt(process_txt,pole_points,newline='\n')
-    	    #第4个参数可以是pole_points,pole_line,pole_plane_points 
-    	else:
-    	    mapp.add_observation(pose_data[4*i:4*(i+1),:],[[0,0,0,1]],[[0,0,0,1]],[[0,0,0,1]])
-    	
-    	mapp.display()
-    	cv2.waitKey(1)
+
+    for i in range(0, len(pose_data[:, 0]) // 4):
+        ret, image = cap.read()
+        image = cv2.resize(image, (W, H))
+        cv2.imshow('video', image)
+        if i == 0:  # 相机位姿一帧一帧画，点云一次性画
+            pole_points, pole_line = get_pole_info(pole_data)  # 获取所有电线杆点云 、线投影
+            '''# 修正电线杆之间的间隔
+            pole_points = correct_interval(pole_points)
+            # 修正 pole_point 与相机位姿曲线的距离
+            pole_points = correct_distance(pole_points, pose_data)'''
+
+            pole_plane_points = projection(pole_points, pose_data, pole_data)  # 相机曲线过每个电线杆中心点的法平面，获取点云的面投影
+
+            mapp.add_observation(pose_data[4 * i:4 * (i + 1), :], [[0, 0, 0, 1]], [[0, 0, 0, 1]], pole_line)
+            # mapp.add_observation(pose_data[4 * i:4 * (i + 1), :], pcd_data, pole_data[:, 1:], pole_points)
+            np.savetxt(process_txt, pole_points, newline='\n')
+            # 第4个参数可以是 pole_points, pole_line, pole_plane_points
+        else:
+            mapp.add_observation(pose_data[4 * i:4 * (i + 1), :], [[0, 0, 0, 1]], [[0, 0, 0, 1]], [[0, 0, 0, 1]])
+
+        mapp.display()
+        cv2.waitKey(1)
     else:
         cv2.waitKey(0)
     

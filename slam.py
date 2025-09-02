@@ -397,34 +397,35 @@ def process_frame(frame):
 
 if __name__ == "__main__":
     # camera intrinsics
-    W, H = 635,360 #635,360; 640
-    F = 656 #656;554 
-    K = np.array([[F,0,W//2],[0,F,H//2],[0,0,1]])
-    mapp = Map(1024, 768)    # 构建地图
+    W, H = 635, 360  # 635,360; 640
+    F = 656  # 656;554
+    K = np.array([[F, 0, W // 2], [0, F, H // 2], [0, 0, 1]])
+    mapp = Map(1024, 768)  # 构建地图
 
-    cap = cv2.VideoCapture("/home/syl/CRH_part1.mp4")
-    
-    pcd_txt1=open("/home/syl/pcd.txt",'a')
+    cap = cv2.VideoCapture("/home/lcy/CRH_part1.mp4")
+
+    pcd_txt1 = open("/home/lcy/pcd.txt", 'a')
     pcd_txt1.truncate(0)
-    pcd_txt2=open("/home/syl/pcd_bbox.txt",'a')
+    pcd_txt2 = open("/home/lcy/pcd_bbox.txt", 'a')
     pcd_txt2.truncate(0)
-    pose_txt=open("/home/syl/pose.txt",'a')
+    pose_txt = open("/home/lcy/pose.txt", 'a')
     pose_txt.truncate(0)
-    bbox = np.loadtxt('/home/syl/CRH_1.txt')
-    
-    while cap.isOpened() :
+    bbox = np.loadtxt('/home/lcy/CRH_1.txt')
+
+    while cap.isOpened():
         ret, image = cap.read()
         if ret:
-            image=cv2.resize(image,(W,H))
+            image = cv2.resize(image, (W, H))
             frame = Frame(image)
-            if frame.idx % 3==1 and len(bbox[bbox[:,0]==frame.idx,:])>0:
-            	frame = process_frame(frame)
-        else:
-            cv2.waitKey(0)
-            break
-        frame.image=cv2.resize(frame.image,(W*2,H*2))
+            if frame.idx % 3 == 1 and len(bbox[bbox[:, 0] == frame.idx, :]) > 0:
+                frame = process_frame(frame)
+            else:
+                cv2.waitKey(0)
+                break
+        frame.image = cv2.resize(frame.image, (W * 2, H * 2))
         cv2.imshow("slam", frame.image)
         mapp.display()
         cv2.waitKey(0)
-        #if frame.idx >450: break
-        if cv2.waitKey(30) & 0xFF == ord('q'): break
+        # if frame.idx >450: break
+        if cv2.waitKey(30) & 0xFF == ord('q'):
+            break
